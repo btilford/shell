@@ -5,16 +5,16 @@ _wp_complete() {
 	local cur=${COMP_WORDS[COMP_CWORD]}
 
 	IFS=$'\n';  # want to preserve spaces at the end
-	local opts="$(wp cli completions --line="$COMP_LINE" --point="$COMP_POINT")"
+	local opts="$(wp cli completions --line="$COMP_LINE" --point="$COMP_POINT")" # shellcheck disable=SC2155
 
 	if [[ "$opts" =~ \<file\>\s* ]]
 	then
-		COMPREPLY=( $(compgen -f -- $cur) )
+		COMPREPLY=( $(compgen -f -- $cur) ) # shellcheck disable=SC2207
 	elif [[ $opts = "" ]]
 	then
-		COMPREPLY=( $(compgen -f -- $cur) )
+		COMPREPLY=( $(compgen -f -- $cur) ) # shellcheck disable=SC2207
 	else
-		COMPREPLY=( ${opts[*]} )
+		COMPREPLY=( ${opts[*]} ) # shellcheck disable=SC2206
 	fi
 
 	IFS="$OLD_IFS"
