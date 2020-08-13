@@ -1,0 +1,13 @@
+# node --completion-bash
+_node_complete() {
+  local cur_word options
+  cur_word="${COMP_WORDS[COMP_CWORD]}"
+  if [[ "${cur_word}" == -* ]] ; then
+    COMPREPLY=( $(compgen -W '--cpu-prof-interval --experimental-specifier-resolution --frozen-intrinsics --tls-min-v1.2 --require --perf-prof-unwinding-info --max-http-header-size --no-force-async-hooks-checks --http-parser --experimental-loader --tls-keylog --inspect-brk-node --input-type --redirect-warnings --no-warnings --trace-deprecation --preserve-symlinks-main --experimental-modules --tls-cipher-list --version --policy-integrity --heap-prof-dir --tls-max-v1.3 --tls-min-v1.0 --security-revert --expose-internals --inspect --help --print --es-module-specifier-resolution --tls-min-v1.1 --v8-pool-size --experimental-vm-modules --debug-brk --debug-arraybuffer-allocations --heap-prof-name --cpu-prof --cpu-prof-name --v8-options --trace-event-categories --icu-data-dir --experimental-wasm-modules --zero-fill-buffers --trace-event-file-pattern --perf-basic-prof-only-functions --test-udp-no-try-send --experimental-wasi-unstable-preview1 --heap-prof-interval --completion-bash --interpreted-frames-native-stack --openssl-config --trace-warnings --napi-modules --use-openssl-ca --use-bundled-ca --title --enable-source-maps --use-largepages --check --experimental-worker --heap-prof --inspect-brk --report-on-signal --experimental-report --max-old-space-size --inspect-publish-uid --report-on-fatalerror --pending-deprecation --stack-trace-limit --trace-uncaught --trace-tls --no-node-snapshot --tls-max-v1.2 --perf-basic-prof --experimental-repl-await --throw-deprecation --experimental-json-modules --report-directory --trace-sync-io --report-filename --report-uncaught-exception --force-context-aware --disallow-code-generation-from-strings --eval --tls-min-v1.3 --unhandled-rejections --trace-exit --heapsnapshot-signal --perf-prof --abort-on-uncaught-exception --prof-process --no-deprecation --preserve-symlinks --debug --track-heap-objects --cpu-prof-dir --experimental-policy --inspect-port --report-signal --interactive --insecure-http-parser --inspect-brk= --debug= --debug-port --print <arg> -c --debug-brk= -e -i --inspect= -p --loader --prof-process -pe -r --security-reverts --trace-events-enabled -v --inspect-brk-node= -h' -- "${cur_word}") )
+    return 0
+  else
+    COMPREPLY=( $(compgen -f "${cur_word}") )
+    return 0
+  fi
+}
+complete -F _node_complete node node_g

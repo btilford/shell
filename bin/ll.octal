@@ -1,0 +1,4 @@
+#!/bin/bash
+
+stat -c '%A %a %h %U %G %s %y %n' *| sed 's/\.[[:digit:]]\+[ ]\+-[[:digit:]]\+/ /'
+

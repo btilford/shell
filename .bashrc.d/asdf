@@ -1,0 +1,7 @@
+
+if [[ "$ASDF_HOME" == "" ]]; then
+  ASDF_HOME="$HOME/.asdf"
+fi
+
+source $ASDF_HOME/asdf.sh
+source $ASDF_HOME/completions/asdf.bash

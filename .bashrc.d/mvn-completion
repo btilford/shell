@@ -1,0 +1,278 @@
+_mvn() {
+    local cur prev opts base profiles plugins versionsGoals versionsArgs trueFalse scope classifier goals
+    COMPREPLY=( )
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+    goals=""
+    opts="-P --activate-profiles"
+    opts="$opts -e --error -X --debug -q --quiet"
+    opts="$opts -C --strict-checksums -c --lax-checksums"
+    opts="$opts -cpu --check-plugin-updates"
+    opts="$opts -o --offline -B --batch-mode"
+    opts="$opts -am --also-make -amd --also-make-dependents"
+    opts="$opts -D --define"
+    opts="$opts -emp --encrypt-master-password -ep --encrypt-password"
+    opts="$opts -f --file"
+    opts="$opts -fae --fail-at-end -ff --fail-fast -fn --fail-never"
+    opts="$opts -gs --global-settings -s --settings -t --toolchains"
+    opts="$opts -h --help"
+    opts="$opts -l --log-file"
+    opts="$opts -N --non-recursive"
+    opts="$opts -npr --no-plugin-registry -npu --no-plugin-updates -up --update-plugins"
+    opts="$opts -nsu --no-snapshot-updates -U --update-snapshots"
+    opts="$opts -pl --projects"
+    opts="$opts -rf --resume-from"
+    opts="$opts -V --show-version -v --version"
+    opts="$opts -Dmaven.test.skip=true -Dmaven.test.failure.ignore=true"
+    opts="$opts -Dmaven.test.error.ignore=true -Dmaven.test.haltafterfailure"
+    opts="$opts -Dmaven.repo.local="
+
+    profiles="local"
+
+    plugins="pre-clean clean post-clean validate initialize"
+    plugins="$plugins generate-sources process-sources generate-resources process-resources"
+    plugins="$plugins compile process-classes"
+    plugins="$plugins generate-test-sources process-test-sources generate-test-resources process-test-resources"
+    plugins="$plugins test-compile process-test-classes test"
+    plugins="$plugins prepare-package package"
+    plugins="$plugins pre-integration-test integration-test post-integration-test"
+    plugins="$plugins verify install deploy"
+    plugins="$plugins pre-site site post-site site-deploy"
+    plugins="$plugins hibernate3:hbm2cfgxml hibernate3:hbm2ddl"
+    plugins="$plugins cargo jetty idea sonar"
+    plugins="$plugins dependency"
+    plugins="$plugins surefire failsafe"
+    plugins="$plugins javadoc"
+
+    plugins="$plugins archetype gpg jarsigner help"
+    plugins="$plugins release reactor"
+    plugins="$plugins scm"
+    plugins="$plugins versions"
+    plugins="$plugins appassembler"
+
+
+
+    versionsGoals="display-dependency-updates display-plugin-updates display-property-updates"
+    versionsGoals="$versionsGoals update-parent update-properties update-child-modules"
+    versionsGoals="$versionsGoals lock-snapshots unlock-snapshots"
+    versionsGoals="$versionsGoals resolve-ranges"
+    versionsGoals="$versionsGoals set"
+    versionsGoals="$versionsGoals use-releases use-next-releases use-latest-releases"
+    versionsGoals="$versionsGoals use-next-snapshots use-latest-snaphsots"
+    versionsGoals="$versionsGoals use-next-versions use-latest-versions"
+    versionsGoals="$versionsGoals commit revert"
+    versionsGoals="$versionsGoals dependency-updates-report plugin-updates-report property-updates-report"
+
+    versionsArgs="includes= processDependencies= processDependencyManagement= newVersion="
+
+    trueFalse='true false'
+    scope='compile test provided runtime'
+    classifier='source javadoc test jdk15 jdk16'
+
+
+    #    echo $cur
+    #    echo $prev
+
+    local cmd=
+    local cmds=
+
+
+
+    #collect args (not order aware)
+    for cmd in $COMP_WORDS
+    do
+        opts="$opts$cmd"
+
+        case $cmd in
+            hibernate) opts="$opts" ;;
+            surefire | test) opts="$opts -Dtest= -Dtest=MyTest -Dtest=*Tests -Dtest=TestA,TestB" ;;
+            help)
+                if [[ $COMP_WORDS[cmd-2] == surefire ]]; then
+                    opts='$opts $goals -Ddetail=true -Dgoal=<goal-name>'
+                fi
+            ;;
+            describe)
+                if [[ $COMP_WORDS[cmd-2] == help ]]; then
+                    opts='$opts $goals -DgroupId= -Dplugin= -Dmojo= -Dcmd='
+                fi
+            ;;
+            -Dcmd= | -Dplugin=) opts='$opts $goals $plugins' ;;
+            verify) opts= '$opts $goals -Dit.test= -Dit.test=MyTest -Dit,test=*Integration -Dit,test=*Integration,*Functional' ;;
+            chekin) opts = '$opts $goals -Dmessage=' ;;
+            release:prepare*)
+                if [[ $COMP_WORDS[cmd-2] == release ]]; then
+                    opts='$opts $goals -DgroupId= -Dplugin= -Dmojo= -Dcmd= -DdryRun=true -Dresume=false -DgenerateReleasePoms=true -DuseEditMode=true -Dtag= -DreleaseVersion= -DdevelopmentVersion='
+                fi
+            ;;
+            release:clean*)
+                if [[ $COMP_WORDS[cmd-2] == release ]]; then
+                    opts='$opts $goals release:prepare release:prepare-with-pom'
+                fi
+            ;;
+            release:branch)
+                if [[ $COMP_WORDS[cmd-2] == release ]]; then
+                    opts='$opts $goals -DbranchName= -DupdateBranchVersions= -DupdateWorkingCopyVersions='
+                fi
+            ;;
+            -DupdateBranchVersions= | -DupdateWorkingCopyVersions=)
+                COMPREPLY=( $( compgen -W $trueFalse -- $cur ) )
+                return 0
+            ;;
+
+            resume)
+                if [[ $COMP_WORDS[cmd-2] == reactor ]]; then
+                    opts='$opts $goals -Dfrom='
+                fi
+            ;;
+            reactor:make*)
+                if [[ $COMP_WORDS[cmd-2] == reactor ]]; then
+                    opts='$opts $goals -Dmake.folders= -Dmake.folders=a,b'
+                fi
+            ;;
+
+            idea)
+                if [[ $COMP_WORDS[cmd-2] == reactor ]]; then
+                    opts='$opts $goals -DdownloadSources=true -DdownloadJavadocs=true -DjdkLevel=1.5'
+                fi
+            ;;
+            versions)
+                opts="$opts$goals$versionsArgs"
+            ;;
+        esac
+
+    done
+
+
+    if [[ ${cur} == -* ]]; then
+        COMPREPLY=( $( compgen -W "${opts}" -- ${cur} ) )
+        return 0
+
+    elif [[ $prev == :* ]]; then
+
+        local goals=
+        case "${COMP_WORDS[COMP_CWORD-2]}" in
+            hibernate3)
+                COMPREPLY=( $( compgen -W '$opts $goals hbm2ddl hbm2cfgxml hbm2doc hbm2hbmxml hbm2java hbmtemplate' -- $cur ) )
+                return 0
+            ;;
+            cargo)
+                COMPREPLY=( $( compgen -W "$opts $goals start stop deploy undeploy deployer-start deployer-stop deployer-redeploy uberwar install" -- $cur ) )
+                return 0
+            ;;
+            jetty)
+                COMPREPLY=( $( compgen -W '$opts $goals run start stop' -- $cur ) )
+                return 0
+            ;;
+            sonar)
+                COMPREPLY=( $( compgen -W '$opts $goals sonar' -- $cur ) )
+                return 0
+            ;;
+            dependency)
+                COMPREPLY=( $( compgen -W '$opts $goals copy copy-dependencies unpack unpack-dependencies resolve list sources resolve-plugins go-offline purge-local-repository build-classpath analyze analyze-dep-mgt tree' -- $cur ) )
+                return 0
+            ;;
+            tree)
+                if [[ ${COMP_WORDS [ COMP_WORD - 4 ]} == dependency ]]; then
+                    COMPREPLY=( $( compgen -W "$opts $goals -Dexcludes= -Dincludes= -DoutputFile= -Dscope= -Dtokens= -Dverbose=" -- $cur ) )
+                fi
+                return 0
+            ;;
+            surefire)
+                COMPREPLY=( $( compgen -W '$opts $goals help test' -- $cur ) )
+                return 0
+            ;;
+            failsafe)
+                COMPREPLY=( $( compgen -W '$opts $goals integration-test verify' -- $cur ) )
+                return 0
+            ;;
+
+            javadoc)
+                COMPREPLY=( $( compgen -W '$opts $goals javadoc test-javadoc javadoc:aggregate test-aggregate jar test-jar aggregate-jar test-aggregate-jar fix test-fix' -- $cur ) )
+                return 0
+            ;;
+            scm)
+                COMPREPLY=( $( compgen -W '$opts $goals branch validate add unedit export bootstrap changelog list checkin checkout status update diff update-subprojects edit tag' -- $cur ) )
+                return 0
+            ;;
+            archetype)
+                COMPREPLY=( $( compgen -W '$opts $goals generate create-from-project crawl' -- $cur ) )
+                return 0
+            ;;
+            help)
+                COMPREPLY=( $( compgen -W '$opts $goals active-profiles all-profiles describe effective-pom effective-settings evaluate expressions system' -- $cur ) )
+                return 0
+            ;;
+            release)
+                COMPREPLY=( $( compgen -W '$opts $goals clean prepare prepare-with-pom rollback perform stage branch update-versions -DautoVersionSubmodules=true -Dresume=true -DscmCommentPrefix -DupdateDependencies=true' -- $cur ) )
+                return 0
+            ;;
+            reactor)
+                COMPREPLY=( $( compgen -W "$opts $goals resume make make-dependents make-scm-changes" -- $cur ) )
+                return 0
+            ;;
+            idea)
+                COMPREPLY=( $( compgen -W "$opts $goals idea" -- $cur ) )
+                return 0
+            ;;
+
+            versions)
+                COMPREPLY=( $( compgen -W "$opts $goals $versionsGoals" -- $cur ) )
+                return 0
+            ;;
+            appassembler)
+                COMPREPLY=( $( compgen -W "$opts $goals assemble create-repository generate-daemons help" -- $cur ) )
+                return 0
+            ;;
+            minijar)
+                COMPREPLY=( $( compgen -W "$opts $goals minijars uberjar" -- $cur ) )
+                return 0
+            ;;
+        esac
+        #
+        #                echo "$goals"
+        COMPREPLY=( $( compgen -W "${goals}" -- ${cur} ) )
+    elif [[ $prev == =* ]]; then
+        local goals=
+        case "${COMP_WORDS[COMP_CWORD-2]}" in
+            -DoutputFile)
+                COMPREPLY=( $( compgen -f -- $cur ) )
+                return 0
+            ;;
+            -Dverbose)
+                COMPREPLY=( $( compgen -W $trueFalse -- $cur ) )
+                return 0
+            ;;
+            -Dscope)
+                COMPREPLY=( $( compgen -W $scope -- $cur ) )
+                return 0
+            ;;
+            -DgroupId=*)
+                COMPREPLY=( $( compgen -W '-DartifactId=' -- $cur ) )
+                return 0
+            ;;
+            -DartifactId=*)
+                COMPREPLY=( $( compgen -W '-DversionId=' -- $cur ) )
+                return 0
+            ;;
+
+        esac
+
+    else
+
+        case $prev in
+            -gs | --global-settings | -f | --file | -l | --log-file | -s | --settings | -t | --toolchains)
+                COMPREPLY=( $( compgen -f -- $cur ) )
+                return 0
+            ;;
+        esac
+
+        COMPREPLY=( $( compgen -W "$plugins" -- $cur ) )
+
+    #        echo $goals
+    #        return 0
+    fi
+    return 0
+}
+
+complete -F _mvn -o nospace mvn
+#COMP_WORDBREAKS=${COMP_WORDBREAKS//\:}

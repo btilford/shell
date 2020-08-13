@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+
+__rush_command() {
+  ##############################################################################
+  # rush --help
+  # Lists commands:
+  # * indented 4 spaces
+  ##############################################################################
+  local subcmds="$(rush -h | grep -e "^\s\s\s\s\w" | awk '{print $1}')"
+  COMPREPLY+=($(compgen -W "$subcmds" -- "$1"))
+}
+__rush_command_option() {
+  ##############################################################################
+  # rush <command> --help
+  # Lists options for <command>:
+  # * indented by 2 spaces and starts with "-" : grep -e "\s\s-" : <awk group 1> (--?\w[-\w]*)
+  # * may be either a flag or require a value : <awk group 2> ([,|\s\w+[\w|_]*,\s])*
+  # * may or may not have shorthand : <awk group 1 "shortand or longhand"> (--?\w[-\w]*) and <awk group 3 "longhand"> (--\w[-\w]*)?
+  ##############################################################################
+
+  local options="$(rush $1 -h | grep -e "\s\s-" | awk -e '/(--?\w[-\w]*)([,|\s\w+[\w|_]*,\s])*(--\w[-\w]*)?/{print $1} {print $3}' | grep "-" | awk 1 ORS=' ')"
+  COMPREPLY+=($(compgen -W "$options" -- "$2"))
+}
+_rush_complete() {
+  local subcmd="${COMP_WORDS[1]}"
+
+  local cur=${COMP_WORDS[COMP_CWORD]}
+  COMPREPLY=($(compgen -W "-h --help" -- "${cur}"))
+
+  if [[ ${#COMP_WORDS[@]} == 2 ]]; then
+    # Suggest rush commands
+    __rush_command "${cur}"
+  else
+    # Suggest options for command
+    __rush_command_option "${COMP_WORDS[1]}" "${cur}"
+  fi
+
+}
+
+complete -F _rush_complete -o nospace rush
