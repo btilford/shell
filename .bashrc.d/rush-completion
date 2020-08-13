@@ -18,7 +18,7 @@ __rush_command_option() {
   # * may or may not have shorthand : <awk group 1 "shortand or longhand"> (--?\w[-\w]*) and <awk group 3 "longhand"> (--\w[-\w]*)?
   ##############################################################################
 
-  local options="$(rush $1 -h | grep -e "\s\s-" | awk -e '/(--?\w[-\w]*)([,|\s\w+[\w|_]*,\s])*(--\w[-\w]*)?/{print $1} {print $3}' | grep "-" | awk 1 ORS=' ')"
+  local options="$(rush $1 -h | grep -e "\s\s-" | awk --source '/(--?\w[-\w]*)([,|\s\w+[\w|_]*,\s])*(--\w[-\w]*)?/{print $1} {print $3}' | grep "-" | awk 1 ORS=' ')"
   COMPREPLY+=($(compgen -W "$options" -- "$2"))
 }
 _rush_complete() {
