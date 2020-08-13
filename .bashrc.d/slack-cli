@@ -1,1 +1,1 @@
-eval "$(register-python-argcomplete slack-cli)"
+[[ "$(which register-python-argcomplete)" != "" && $(which slack-cli) != "" ]] && eval "$(register-python-argcomplete slack-cli)"

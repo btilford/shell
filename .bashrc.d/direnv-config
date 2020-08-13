@@ -1,1 +1,1 @@
-eval "$(direnv hook bash)"
+[[ "$(which direnv)" != "" ]] && eval "$(direnv hook bash)"
