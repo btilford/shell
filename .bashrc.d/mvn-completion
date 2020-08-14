@@ -1,3 +1,4 @@
+# shellcheck disable=SC2207 disable=SC2086 disable=SC2016 disable=SC1087 disable=SC2034 disable=SC2203 disable=SC2128
 _mvn() {
     local cur prev opts base profiles plugins versionsGoals versionsArgs trueFalse scope classifier goals
     COMPREPLY=( )
@@ -97,8 +98,8 @@ _mvn() {
                 fi
             ;;
             -Dcmd= | -Dplugin=) opts='$opts $goals $plugins' ;;
-            verify) opts= '$opts $goals -Dit.test= -Dit.test=MyTest -Dit,test=*Integration -Dit,test=*Integration,*Functional' ;;
-            chekin) opts = '$opts $goals -Dmessage=' ;;
+            verify) opts='$opts $goals -Dit.test= -Dit.test=MyTest -Dit,test=*Integration -Dit,test=*Integration,*Functional' ;;
+            chekin) opts='$opts $goals -Dmessage=' ;;
             release:prepare*)
                 if [[ $COMP_WORDS[cmd-2] == release ]]; then
                     opts='$opts $goals -DgroupId= -Dplugin= -Dmojo= -Dcmd= -DdryRun=true -Dresume=false -DgenerateReleasePoms=true -DuseEditMode=true -Dtag= -DreleaseVersion= -DdevelopmentVersion='

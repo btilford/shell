@@ -1,1 +1,2 @@
-[[ "$(which register-python-argcomplete)" != "" && $(which slack-cli) != "" ]] && eval "$(register-python-argcomplete slack-cli)"
+# shellcheck disable=SC2148
+[[ "$(command -v register-python-argcomplete)" != "" && $(command -v slack-cli) != "" ]] && eval "$(register-python-argcomplete slack-cli)"

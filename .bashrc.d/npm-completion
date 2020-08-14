@@ -1,5 +1,4 @@
-
-
+# shellcheck disable=SC2034 disable=SC2207 disable=SC2162 disable=SC2219 disable=SC2046
 ###-begin-npm-completion-###
 #
 # npm command completion script

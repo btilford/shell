@@ -1,7 +1,9 @@
+# shellcheck disable=SC1090
+if [[ "$(command -v asdf)" != "" ]]; then
+  if [[ "$ASDF_HOME" == "" ]]; then
+    ASDF_HOME="$HOME/.asdf"
+  fi
 
-if [[ "$ASDF_HOME" == "" ]]; then
-  ASDF_HOME="$HOME/.asdf"
+  source "$ASDF_HOME/asdf.sh"
+  source "$ASDF_HOME/completions/asdf.bash"
 fi
-
-source $ASDF_HOME/asdf.sh
-source $ASDF_HOME/completions/asdf.bash
