@@ -19,16 +19,18 @@ __rush_command_option() {
   # * may be either a flag or require a value : <awk group 2> ([,|\s\w+[\w|_]*,\s])*
   # * may or may not have shorthand : <awk group 1 "shortand or longhand"> (--?\w[-\w]*) and <awk group 3 "longhand"> (--\w[-\w]*)?
   ##############################################################################
-
   local options
-  # local options="$(rush $1 -h | grep -e "\s\s-" | awk --source '/(--?\w[-\w]*)([,|\s\w+[\w|_]*,\s])*(--\w[-\w]*)?/{print $1} {print $3}' | grep "-" | awk 1 ORS=' ')"
+#  local options="$(rush $1 -h | grep -e "\s\s-" | awk --source '/(--?\w[-\w]*)([,|\s\w+[\w|_]*,\s])*(--\w[-\w]*)?/{print $1} {print $3}' | grep "-" | awk 1 ORS=' ')"
   # need them unescaped
   # shellcheck disable=SC2086
-  options="$(rush $1 -h | grep -e "\s\s-" | awk --source '/(--?\w[-\w]*)([,|\s\w+[\w|_]*,\s])*(--\w[-\w]*)?/{print $1} {print $2} {print 3}' | sed 's/,//' | grep "-" | awk 1 ORS=' ')"
+  options="$(rush $1 -h | grep -e "\s\s-" | awk --source '/([\-\-?]?\w[-\w]*)([,|\s\w+[\w|_]*,\s])*(--\w[-\w]*)?/{print $1} {print $2} {print $3}' | sed 's/,//' | grep "-" | awk 1 ORS=' ')"
   COMPREPLY+=($(compgen -W "$options" -- "$2"))
 }
 _rush_complete() {
-  # local subcmd="${COMP_WORDS[1]}"
+  local subcmd
+  # This might not be used but has side effects?
+  # shellcheck disable=SC2034
+  subcmd="${COMP_WORDS[1]}"
 
   local cur=${COMP_WORDS[COMP_CWORD]}
   COMPREPLY=($(compgen -W "-h --help" -- "${cur}"))
